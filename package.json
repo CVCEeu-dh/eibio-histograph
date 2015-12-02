@@ -1,0 +1,21 @@
+{
+  "name": "eibio-hg",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "decypher": "^0.1.2",
+    "exectimer": "^1.1.0",
+    "lodash": "^3.10.1",
+    "seraph": "^0.14.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4",
+    "should": "^7.1.1"
+  }
+}
