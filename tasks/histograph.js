@@ -44,14 +44,14 @@ function toLucene(query, field) {
 
 
 module.exports = {
-  getDoisByEibio: function(options, callback) {
-    console.log(clc.yellowBright('\n   tasks.histograph.getPersonByEibio'));
+  getMediaByEibio: function(options, callback) {
+    console.log(clc.yellowBright('\n   tasks.histograph.getMediaByEibio'));
     var dois = [];
 
     var q = async.queue(function (person, nextPerson) {
       console.log(clc.blackBright('   looking for dois:', clc.cyanBright(person.slug), q.length(), 'remaining'));
     // console.log(person)
-      neo4j.query('START per=node:node_auto_index({query}) WITH per WHERE last(labels(per)) = "person" WITH per MATCH (per)-[r]-(t:resource) WHERE has(t.doi) WITH per, {id: id(t), tfidf: r.tfidf, tf: r.tf, doi: t.doi, start_date:t.start_date, end_date:t.end_date, start_time:t.start_time, end_time:t.end_time, name: COALESCE(t.title_en, t.title_fr, t.title_de, t.name)} as media  RETURN per as person, collect(media) as dois', {
+      neo4j.query('START per=node:node_auto_index({query}) WITH per WHERE last(labels(per)) = "person" WITH per MATCH (per)-[r:appears_in]->(t:resource) WHERE has(t.doi) WITH per, {id: id(t), uuid: t.uuid, tfidf: r.tfidf, tf: r.tf, doi: t.doi, start_date:t.start_date, end_date:t.end_date, start_time:t.start_time, end_time:t.end_time, name: COALESCE(t.title_en, t.title_fr, t.title_de, t.name)} as media  RETURN per as person, collect(media) as dois', {
         query: toLucene(person.name, 'name_search')
       }, function (err, nodes) {
         if(err) {
@@ -66,12 +66,19 @@ module.exports = {
         }
         // console.log(options.person)
         console.log(clc.blackBright('   people found:', clc.magentaBright(nodes.length)));
-        console.log(_.map(_.map(nodes, 'person'),'name'));  
-        console.log(clc.blackBright('   dbpedia found:', clc.magentaBright(_.compact(_.map(_.map(nodes, 'person'),'links_wiki')).length)));
-        console.log(_.map(_.map(nodes, 'person'),'links_wiki'));  
+        console.log('  ',_(nodes).map('person').map('name').value().join(', '));  
+        console.log(clc.blackBright('   dbpedia found:', clc.magentaBright(_.compact(_.map(_.map(nodes, 'person'),'links_wiki')).length)), _(nodes).map('person').map('links_wiki').compact().value());
+
+
+        // get most complete cvce_histograph id
+        var candidates = _(nodes).map('person').filter(function(d) {
+          return !!d.links_wiki || !!d.links_viaf || !!d.last_name
+        }).value();
+        console.log('   candidates:',_(candidates).map('name').value()); 
+
 
         // assemble dois
-        var _dois = _.sortByOrder(
+        var _dois = _.orderBy(
           _.map(
             _.values(
               _.groupBy(
@@ -81,8 +88,9 @@ module.exports = {
               )
             ), function (dois) {
             return {
-              eibio_slug: person.slug,
-              histograph_id: dois[0].id,
+              person_slug: person.slug,
+              person_cvcehg: _(candidates).map('uuid').first(),
+              links_cvcehg: dois[0].uuid,
               tfidf: _.get(_.max(dois, 'tfidf'), 'tfidf') || 0,
               tf: _.get(_.max(dois, 'tf'), 'tf') || 0,
               doi: _.first(_.compact(_.map(dois, 'doi'))),

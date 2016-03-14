@@ -26,16 +26,20 @@ var fs          = require('fs'),
     availableTasks = _.assign({
       demo: [],
 
-      get_person_dois: [
+      syncone: [
         tasks.eibio.getPerson,
-        tasks.histograph.getDoisByEibio,
+        tasks.eibio.cleanMedia,
+        tasks.histograph.getMediaByEibio,
+        tasks.eibio.assignMedia,
+        tasks.eibio.assignHistographLink
+      ],
+
+      sync: [
+        tasks.eibio.getPeople,
+        tasks.eibio.cleanMedia,
+        tasks.histograph.getMediaByEibio,
         tasks.eibio.assignMedia
       ],
-      get_people_dois: [
-        tasks.eibio.getPeople,
-        tasks.histograph.getDoisByEibio,
-        tasks.eibio.assignMedia
-      ]
     }, settings.availableTasks || {});
 
 console.log(clc.whiteBright( "\n\n +-+-+-+-+-+ +-+-+"));
