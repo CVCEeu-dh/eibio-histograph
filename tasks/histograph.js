@@ -76,6 +76,8 @@ module.exports = {
         }).value();
         console.log('   candidates:',_(candidates).map('name').value()); 
 
+        if(!candidates.length)
+          candidates = _(nodes).map('person').value();
 
         // assemble dois
         var _dois = _.orderBy(

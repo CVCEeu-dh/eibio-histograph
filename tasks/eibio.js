@@ -108,6 +108,7 @@ module.exports = {
 
     var q = async.queue(function (cluster, nextCluster) {
       var person = _.first(cluster.value());
+      console.log(cluster)
 
       console.log(clc.blackBright('   person:', clc.cyanBright(person.person_slug), '- link:', clc.greenBright(person.person_cvcehg), '- remaining'), q.length());
 
@@ -119,8 +120,8 @@ module.exports = {
         } else
           nextCluster();
       });
-    }, 3);
-    q.push(_(options.dois).keyBy('person_slug').values());
+    }, 1);
+    q.push(_(options.dois).filter('person_cvcehg').keyBy('person_slug').values());
     q.drain = function() {
       callback(null, options)
     };
