@@ -38,7 +38,8 @@ var fs          = require('fs'),
         tasks.eibio.getPeople,
         tasks.eibio.cleanMedia,
         tasks.histograph.getMediaByEibio,
-        tasks.eibio.assignMedia
+        tasks.eibio.assignMedia,
+        tasks.eibio.assignHistographLink
       ],
     }, settings.availableTasks || {});
 
