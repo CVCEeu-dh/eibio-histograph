@@ -71,7 +71,7 @@ module.exports = {
         } else
           nextPerson();
       });
-    }, 3);
+    }, 1);
     q.push(options.records);
     q.drain = function() {
       callback(null, options)
@@ -90,10 +90,12 @@ module.exports = {
           q.kill();
           callback(err)
           return;
-        } else
+        } else{
+          console.log(clc.blackBright('     assigned:', clc.cyanBright(media.links_cvcehg), '      remaining'), q.length());
           nextMedia();
+        }
       });
-    }, 3);
+    }, 1);
     q.push(options.dois);
     q.drain = function() {
       callback(null, options)
